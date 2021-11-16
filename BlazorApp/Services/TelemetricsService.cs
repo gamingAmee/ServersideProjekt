@@ -20,7 +20,7 @@ namespace BlazorApp.Services
         {
             UriBuilder builder = new UriBuilder(ApiConstants.BaseApiUrl)
             {
-                Path = $"{ApiConstants.TelemetricsEndpoint}/GetTelemetryData"
+                Path = $"{ApiConstants.TelemetricsEndpoint}"
             };
             string url = builder.Path;
 
