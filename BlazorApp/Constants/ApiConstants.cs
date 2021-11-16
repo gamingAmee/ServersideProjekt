@@ -1,6 +1,5 @@
-﻿using Xamarin.Forms;
-
-namespace AppProjekt.Constants
+﻿
+namespace BlazorApp.Constants
 {
     public static class ApiConstants
     {

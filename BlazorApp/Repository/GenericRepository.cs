@@ -16,9 +16,9 @@ namespace Repository
 
         public GenericRepository()
         {
-    #if DEBUG
+#if DEBUG
             httpClientHandler.ServerCertificateCustomValidationCallback = (message, certificate, chain, sslPolicyErrors) => true;
-    #endif
+#endif
             httpClient = new HttpClient(httpClientHandler);
         }
 
@@ -90,7 +90,7 @@ namespace Repository
                 throw;
             }
         }
-       
+
         public async Task<TR> PostAsync<T, TR>(string uri, T data, string authToken = "")
         {
             try

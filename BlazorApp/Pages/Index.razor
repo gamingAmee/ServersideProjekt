@@ -1,7 +1,65 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <RadzenButton IsBusy="@isBusy" Click=@Refresh Text="Refresh" />
+            @*<RadzenDropDown TValue="string" Data=@TimePick Change="@OnChange" />*@
+            <RadzenChart>
+                <RadzenLineSeries Smooth="@smooth" Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Temp" LineType="LineType.Dashed" ValueProperty="Temperatur">
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+            </RadzenChart>
+            <RadzenChart>
+                <RadzenLineSeries Smooth="@smooth" Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Hum" LineType="LineType.Dashed" ValueProperty="Humidity">
+                    <RadzenMarkers MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+            </RadzenChart>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@code{
+    bool smooth = true;
+    bool isBusy = false;
+    public IEnumerable<Telemetrics> TelemetricsList { get; set; }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    public List<string> TimePick
+    {
+        get
+        {
+            return new List<string> { "1 min", "10 mins", "1 hour" };
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isBusy = true;
+        TelemetricsList = await _telemetricsService.GetTelemetricsAsync();
+        isBusy = false;
+    }
+
+    private async Task Refresh()
+    {
+        isBusy = true;
+        TelemetricsList = await _telemetricsService.GetTelemetricsAsync();
+        isBusy = false;
+    }
+
+    //private void OnChange(object value)
+    //{
+    //    switch (value)
+    //    {
+    //        case "1 min":
+
+    //            break;
+    //        case "10 mins":
+
+    //            break;
+    //        case "1 hour":
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
+}

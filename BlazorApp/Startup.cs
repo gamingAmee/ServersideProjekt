@@ -15,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Repository;
+using BlazorApp.Services;
 
 namespace BlazorApp
 {
@@ -40,7 +42,8 @@ namespace BlazorApp
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IGenericRepository, GenericRepository>();
+            services.AddScoped<ITelemetricsService, TelemetricsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

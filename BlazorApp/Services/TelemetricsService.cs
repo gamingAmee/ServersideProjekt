@@ -1,22 +1,19 @@
-﻿using AppProjekt.Constants;
-using AppProjekt.Models;
-using MonkeyCache.FileStore;
+﻿using BlazorApp.Constants;
+using BlazorApp.Data;
 using Repository;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TinyIoC;
-using Xamarin.Essentials;
 
-namespace AppProjekt.Services
+namespace BlazorApp.Services
 {
     public class TelemetricsService : ITelemetricsService
     {
         private readonly IGenericRepository _genericRepository;
-        public TelemetricsService()
+        public TelemetricsService(IGenericRepository genericRepository)
         {
-            _genericRepository = TinyIoCContainer.Current.Resolve<IGenericRepository>();
+            _genericRepository = genericRepository;
         }
 
         public async Task<IEnumerable<Telemetrics>> GetTelemetricsAsync()
@@ -27,19 +24,7 @@ namespace AppProjekt.Services
             };
             string url = builder.Path;
 
-            if (Connectivity.NetworkAccess == NetworkAccess.None)
-            {
-                return Barrel.Current.Get<IEnumerable<Telemetrics>>(key: url);
-            }
-            if (!Barrel.Current.IsExpired(key: url))
-            {
-                return Barrel.Current.Get<IEnumerable<Telemetrics>>(key: url);
-            }
-            var telemetrics = await _genericRepository.GetAsync<IEnumerable<Telemetrics>>(builder.ToString());
-
-            Barrel.Current.Add(key: url, data: telemetrics, expireIn: TimeSpan.FromSeconds(20));
-
-            return telemetrics;
+           return await _genericRepository.GetAsync<IEnumerable<Telemetrics>>(builder.ToString());
         }
 
         //public async Task<Telemetrics> GetTelemetricsAsync(string id)

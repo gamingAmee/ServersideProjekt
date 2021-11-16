@@ -1,8 +1,8 @@
-﻿using AppProjekt.Models;
+﻿using BlazorApp.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AppProjekt.Services
+namespace BlazorApp.Services
 {
     public interface ITelemetricsService
     {

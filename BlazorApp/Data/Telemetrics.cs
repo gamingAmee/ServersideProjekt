@@ -7,8 +7,8 @@ namespace BlazorApp.Data
 {
     public class Telemetrics
     {
-        public string Temperatur { get; set; }
-        public string Humidity { get; set; }
+        public double Temperatur { get; set; }
+        public double Humidity { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }
