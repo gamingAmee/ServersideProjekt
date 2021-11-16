@@ -3,63 +3,85 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 my-5">
-            <RadzenButton IsBusy="@isBusy" Click=@Refresh Text="Refresh" />
-            @*<RadzenDropDown TValue="string" Data=@TimePick Change="@OnChange" />*@
+            <div class="justify-content-center">
+                <RadzenButton IsBusy="@isBusy" Click=@Refresh Text="Refresh" />
+                <RadzenDropDown Placeholder="Pick a time" TValue="string" Data=@TimePick Change="@OnChange" />
+            </div>
+
             <RadzenChart>
-                <RadzenLineSeries Smooth="@smooth" Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Temp" LineType="LineType.Dashed" ValueProperty="Temperatur">
+                <RadzenLineSeries Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Temperatur" LineType="LineType.Solid" ValueProperty="Temperatur">
                     <RadzenMarkers MarkerType="MarkerType.Circle" />
                 </RadzenLineSeries>
             </RadzenChart>
             <RadzenChart>
-                <RadzenLineSeries Smooth="@smooth" Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Hum" LineType="LineType.Dashed" ValueProperty="Humidity">
+                <RadzenLineSeries Data="@TelemetricsList" CategoryProperty="Timestamp" Title="Humidity" LineType="LineType.Solid" ValueProperty="Humidity">
                     <RadzenMarkers MarkerType="MarkerType.Circle" />
                 </RadzenLineSeries>
+                @*<RadzenCategoryAxis  FormatString="{0:d} {0:t}"/>*@
             </RadzenChart>
         </div>
     </div>
 </div>
 
 @code{
-    bool smooth = true;
     bool isBusy = false;
-    public IEnumerable<Telemetrics> TelemetricsList { get; set; }
+    public List<Telemetrics> TelemetricsList { get; set; }
 
     public List<string> TimePick
     {
         get
         {
-            return new List<string> { "1 min", "10 mins", "1 hour" };
+            return new List<string> { "All" ,"10 mins", "30 mins", "1 hour" };
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
         isBusy = true;
-        TelemetricsList = await _telemetricsService.GetTelemetricsAsync();
+        var tempList = await _telemetricsService.GetTelemetricsAsync();
+        TelemetricsList = tempList.ToList();
         isBusy = false;
     }
 
     private async Task Refresh()
     {
         isBusy = true;
-        TelemetricsList = await _telemetricsService.GetTelemetricsAsync();
+        var tempList = await _telemetricsService.GetTelemetricsAsync();
+        TelemetricsList = tempList.ToList();
         isBusy = false;
     }
 
-    //private void OnChange(object value)
-    //{
-    //    switch (value)
-    //    {
-    //        case "1 min":
+    private async Task OnChange(object value)
+    {
+        await Refresh();
+        List<Telemetrics> templist = new();
+        var lastTelemetrics = TelemetricsList.LastOrDefault();
+        switch (value)
+        {
+            case "10 mins":
+                foreach (var item in TelemetricsList.Where(t => t.Timestamp >= lastTelemetrics.Timestamp.AddMinutes(-10)).OrderByDescending(t => t.Timestamp))
+                {
+                    templist.Add(item);
+                }
+                TelemetricsList = templist;
+                break;
+            case "30 mins":
+                foreach (var item in TelemetricsList.Where(t => t.Timestamp >= lastTelemetrics.Timestamp.AddMinutes(-30)).OrderByDescending(t => t.Timestamp))
+                {
+                    templist.Add(item);
+                }
+                TelemetricsList = templist;
+                break;
+            case "1 hour":
+                foreach (var item in TelemetricsList.Where(t => t.Timestamp >= lastTelemetrics.Timestamp.AddMinutes(-60)).OrderByDescending(t => t.Timestamp))
+                {
+                    templist.Add(item);
+                }
+                TelemetricsList = templist;
+                break;
 
-    //            break;
-    //        case "10 mins":
-
-    //            break;
-    //        case "1 hour":
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //}
+            default:
+                break;
+        }
+    }
 }
