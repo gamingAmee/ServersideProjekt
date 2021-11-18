@@ -2,22 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Models;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TelemetricsController : ControllerBase
     {
         private readonly EfContext _context;
+        private readonly ITelemetricsService _telemetricsService;
 
-        public TelemetricsController(EfContext context)
+        public TelemetricsController(EfContext context, ITelemetricsService telemetricsService)
         {
             _context = context;
+            _telemetricsService = telemetricsService;
+            Task.Run(() => GetTelemetricsAsync()).Wait();
+        }
+
+        private async Task GetTelemetricsAsync()
+        {
+            if (_context.Telemetrics.Count() == 0 || _context.Telemetrics == null)
+            {
+                List<Telemetrics> telemetrics = await _telemetricsService.GetTelemetricsAsync();
+                _context.Telemetrics.AddRange(telemetrics);
+                _context.SaveChanges();
+            }
         }
 
         // GET: api/Telemetrics
